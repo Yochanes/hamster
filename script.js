@@ -17,7 +17,7 @@ function loadTable() {
             let input = document.createElement('input');
             input.type = 'text';
             input.value = row[key];
-            input.oninput = () => updateRow(index);
+            input.oninput = () => updateRow(index, key, input.value);
             newCell.appendChild(input);
         }
         
@@ -29,23 +29,28 @@ function loadTable() {
     });
 }
 
-function updateRow(index) {
-    const tableBody = document.getElementById('investmentTable').getElementsByTagName('tbody')[0];
+function updateRow(index, key, value) {
     let tableData = JSON.parse(localStorage.getItem('tableData')) || [];
-    let row = tableBody.rows[index];
-    let rowData = {};
+    tableData[index][key] = value;
     
-    row.querySelectorAll('input').forEach((input, colIndex) => {
-        let key = ['Название карточки', 'Прибыль в час', 'Уровень', 'Стоимость прокачки', 'Окупаемость в часах'][colIndex];
-        rowData[key] = input.value;
-    });
-
-    rowData['Окупаемость в часах'] = (parseFloat(rowData['Стоимость прокачки']) / parseFloat(rowData['Прибыль в час'])).toFixed(2);
-    row.querySelectorAll('input')[4].value = rowData['Окупаемость в часах'];
+    if (key === 'Прибыль в час' || key === 'Стоимость прокачки') {
+        tableData[index]['Окупаемость в часах'] = (parseFloat(tableData[index]['Стоимость прокачки']) / parseFloat(tableData[index]['Прибыль в час'])).toFixed(2);
+    }
     
-    tableData[index] = rowData;
     localStorage.setItem('tableData', JSON.stringify(tableData));
-    loadTable(); // Перезагрузить таблицу для обновления сортировки
+    updateTableRow(index, tableData[index]);
+}
+
+function updateTableRow(index, rowData) {
+    const tableBody = document.getElementById('investmentTable').getElementsByTagName('tbody')[0];
+    let row = tableBody.rows[index];
+
+    let cells = row.getElementsByTagName('input');
+    cells[0].value = rowData['Название карточки'];
+    cells[1].value = rowData['Прибыль в час'];
+    cells[2].value = rowData['Уровень'];
+    cells[3].value = rowData['Стоимость прокачки'];
+    cells[4].value = rowData['Окупаемость в часах'];
 }
 
 function addRow() {
