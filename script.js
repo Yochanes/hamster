@@ -4,8 +4,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
 function loadTable() {
     let tableData = JSON.parse(localStorage.getItem('tableData')) || [];
+    tableData.sort((a, b) => parseFloat(a['Окупаемость в часах']) - parseFloat(b['Окупаемость в часах']));
+    
     const tableBody = document.getElementById('investmentTable').getElementsByTagName('tbody')[0];
-
     tableBody.innerHTML = '';
 
     tableData.forEach((row, index) => {
@@ -44,6 +45,7 @@ function updateRow(index) {
     
     tableData[index] = rowData;
     localStorage.setItem('tableData', JSON.stringify(tableData));
+    loadTable(); // Перезагрузить таблицу для обновления сортировки
 }
 
 function addRow() {
@@ -65,3 +67,4 @@ function deleteRow(index) {
     localStorage.setItem('tableData', JSON.stringify(tableData));
     loadTable();
 }
+
